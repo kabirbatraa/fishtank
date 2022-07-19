@@ -1,15 +1,19 @@
 
-const maxRotationVel = 0.04;
+const maxRotationVel = 0.07;
+const boidVel = 3;
+const turningFriction = 0.008;
+
+const wallForce = 0.01;
+const socialDistanceForce = 0.01;
 
 const socialDistanceSize = 100;
-
 const wallDistance = 100;
 
 class Boid {
   constructor(x = width/2, y = height/2, r = 0) {
     this.pos = createVector(x, y);
 
-    this.vel = 2;
+    this.vel = boidVel;
     // this.vel = 0;
 
     this.rotation = r
@@ -89,7 +93,7 @@ class Boid {
       let avg = atan2(sums.y, sums.x);
 
       drawArrow(this.pos, createVector(100*cos(avg), 100*sin(avg)), 'purple')
-      this.goToGoalVector(avg, 0.002);
+      this.goToGoalVector(avg, wallForce);
     }
   }
 
@@ -111,8 +115,7 @@ class Boid {
         let goalVector = boidToThisVector;
 
         drawArrow(boid.pos, boidToThisVector, 'green');
-        this.goToGoalVector(goalVector.heading(), 0.004);
-
+        this.goToGoalVector(goalVector.heading(), socialDistanceForce);
 
       }
     }
@@ -178,9 +181,9 @@ class Boid {
     if (this.rotationVel > maxRotationVel) this.rotationVel = maxRotationVel
     if (this.rotationVel < -maxRotationVel) this.rotationVel = -maxRotationVel
     this.rotation += this.rotationVel;
-    if (abs(this.rotationVel) < 0.001) this.rotationVel = 0;
-    if (this.rotationVel > 0.001) this.rotationVel -= 0.001;
-    if (this.rotationVel < -0.001) this.rotationVel += 0.001;
+    if (abs(this.rotationVel) < turningFriction) this.rotationVel = 0;
+    if (this.rotationVel > turningFriction) this.rotationVel -= turningFriction;
+    if (this.rotationVel < -turningFriction) this.rotationVel += turningFriction;
 
     // move position by velocity
     this.pos.x += this.vel * cos(this.rotation)
