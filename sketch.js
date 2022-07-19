@@ -20,10 +20,11 @@ function setup() {
 function draw() {
   background(220);
 
-  boid2.pos.x = mouseX; boid2.pos.y = mouseY;
+  // boid2.pos.x = moruseX; boid2.pos.y = mouseY;
   // boid2.socialDistance(boids);
 
   for (let boid of boids) {
+    boid.applyWallForce();
     boid.socialDistance(boids);
     boid.draw(boids);
     boid.update()
@@ -37,7 +38,7 @@ function draw() {
 
 
 function drawArrow(base, vec, myColor) {
-
+  // return;
   // vec = p5.Vector.sub(vec, base);
 
   push();

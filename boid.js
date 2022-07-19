@@ -3,6 +3,8 @@ const maxRotationVel = 0.04;
 
 const socialDistanceSize = 100;
 
+const wallDistance = 100;
+
 class Boid {
   constructor(x = width/2, y = height/2, r = 0) {
     this.pos = createVector(x, y);
@@ -31,12 +33,64 @@ class Boid {
     vertex(-15, 15);
     endShape(CLOSE);
     noFill();
-    circle(0,0,socialDistanceSize*2);
+    // circle(0,0,socialDistanceSize*2);
     pop()
+  }
+
+  goToGoalVector(goalVectorDir, rotationalForce) {
+
+    if (((this.rotation - goalVectorDir) + 2*PI) % (2*PI) > PI) { 
+      this.applyRotationForce(rotationalForce); // turn right
+    } 
+    else {
+      this.applyRotationForce(-rotationalForce);
+    }
   }
 
   applyRotationForce(changeRotationVelocity) {
     this.rotationVel += changeRotationVelocity;
+  }
+
+  applyWallForce() {
+    let nearWall = false;
+    let forces = []
+    if (this.pos.x < wallDistance) {
+      nearWall = true;
+      forces.push(0) // right
+    }
+    if (this.pos.y < wallDistance) {
+      nearWall = true;
+      forces.push(PI/2)
+    }
+    if (this.pos.x > width - wallDistance) {
+      nearWall = true;
+      forces.push(PI) // right
+    }
+    if (this.pos.y > height - wallDistance) {
+      nearWall = true;
+      forces.push(3*PI/2)
+    }
+
+    if (!nearWall) {
+      this.color = 'white';
+    }
+    else {
+      // this formula does not work :c
+      // let sum = forces.reduce((partialSum, num) => (partialSum + num), 0)
+      // let avg = sum / forces.length;
+
+      let sums = forces.reduce((partialSums, angle) => {
+        partialSums.y += sin(angle);
+        partialSums.x += cos(angle);
+        return partialSums;
+      }, createVector(0, 0))
+      // dividing by forces.length for y and x component is redundant
+      // let avg = atan2(sums[0] / forces.length, sums[1] / forces.length)
+      let avg = atan2(sums.y, sums.x);
+
+      drawArrow(this.pos, createVector(100*cos(avg), 100*sin(avg)), 'purple')
+      this.goToGoalVector(avg, 0.002);
+    }
   }
 
   socialDistance(allBoids) {
@@ -55,27 +109,19 @@ class Boid {
         let boidToThisVector = createVector(this.pos.x - boid.pos.x, this.pos.y - boid.pos.y)
         
         let goalVector = boidToThisVector;
-        let goalVectorDir = goalVector.heading();
-        // drawArrow()
+
         drawArrow(boid.pos, boidToThisVector, 'green');
-        
-        if (((this.rotation - goalVectorDir) + 2*PI) % (2*PI) > PI) { 
-          this.applyRotationForce(0.005); // turn right
-          // console.log('right')
-        } 
-        else {
-          this.applyRotationForce(-0.005);
-          // console.log('left')
-        }
+        this.goToGoalVector(goalVector.heading(), 0.004);
+
+
       }
     }
-    if (isNearBoid) {
-      this.color = 'red';
-      // this.applyRotationForce(random([-1, 1]) * 0.01);
-    }
-    else {
-      this.color = 'white'
-    }
+    // if (isNearBoid) {
+    //   this.color = 'red';
+    // }
+    // else {
+    //   this.color = 'white'
+    // }
   }
 
   OLDsocialDistance(allBoids) {
@@ -140,11 +186,19 @@ class Boid {
     this.pos.x += this.vel * cos(this.rotation)
     this.pos.y += this.vel * sin(this.rotation)
     
+    /*
     // if pos off the screen, then wrap around
     if (this.pos.x > width) this.pos.x = 0
     if (this.pos.x < 0) this.pos.x = width;
     if (this.pos.y > height) this.pos.y = 0
     if (this.pos.y < 0) this.pos.y = height;
+    */
+    
+    if (this.pos.x > width) this.pos.x = width
+    if (this.pos.x < 0) this.pos.x = 0;
+    if (this.pos.y > height) this.pos.y = height
+    if (this.pos.y < 0) this.pos.y = 0;
+    
 
     // if rotation greater than 2pi, then wrap around
     this.rotation = this.rotation % (2*PI);
