@@ -1,13 +1,15 @@
 
-const maxRotationVel = 0.07;
+const maxRotationVel = 0.06;
 const boidVel = 3;
 const turningFriction = 0.008;
 
 const wallForce = 0.0085;
 const socialDistanceForce = 0.01;
+const assimilateForce = 0.005;
 
-const socialDistanceSize = 100;
-const wallDistance = 150;
+const socialDistanceSize = 50;
+const wallDistance = 100;
+const assimilateSize = 100
 
 class Boid {
   constructor(x = width/2, y = height/2, r = 0) {
@@ -37,7 +39,10 @@ class Boid {
     vertex(-15, 15);
     endShape(CLOSE);
     noFill();
-    // circle(0,0,socialDistanceSize*2);
+    stroke('red')
+    circle(0,0,socialDistanceSize*2);
+    stroke('blue')
+    circle(0,0,assimilateSize*2);
     pop()
   }
 
@@ -98,7 +103,6 @@ class Boid {
   }
 
   socialDistance(boid) {
-    // if (boid == this) continue;
     let deltaX = abs(this.pos.x - boid.pos.x);
     let deltaY = abs(this.pos.y - boid.pos.y);
     if (socialDistanceSize*socialDistanceSize >= deltaX*deltaX + deltaY*deltaY) {
@@ -117,7 +121,18 @@ class Boid {
 
 
   assimilate(boid) {
+    let deltaX = abs(this.pos.x - boid.pos.x);
+    let deltaY = abs(this.pos.y - boid.pos.y);
+    if (assimilateSize*assimilateSize >= deltaX*deltaX + deltaY*deltaY) {
 
+      // let boidDirectionVector = boid.rotation;
+      
+      // let goalVector = boid.rotation as a vector;
+
+      // drawArrow(boid.pos, boidToThisVector, 'green');
+      this.goToGoalVector(boid.rotation, assimilateForce);
+
+    }
   }
 
   update(allBoids) {
@@ -136,7 +151,7 @@ class Boid {
     if (this.rotationVel > maxRotationVel) this.rotationVel = maxRotationVel
     if (this.rotationVel < -maxRotationVel) this.rotationVel = -maxRotationVel
     this.rotation += this.rotationVel;
-    if (abs(this.rotationVel) < turningFriction) this.rotationVel = 0;
+    if (abs(this.rotationVel) <= turningFriction) this.rotationVel = 0;
     if (this.rotationVel > turningFriction) this.rotationVel -= turningFriction;
     if (this.rotationVel < -turningFriction) this.rotationVel += turningFriction;
 

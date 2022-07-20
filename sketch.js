@@ -4,16 +4,18 @@ let boids = [];
 let boid2;
 
 function setup() {
-  createCanvas(600, 600);
+  createCanvas(windowWidth, windowHeight);
 
   noStroke()
 
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 10; i++) {
     boids.push(new Boid(width/2, height/2, random(0, 2*PI)));
   }
 
   boid2 = new Boid(width/2, height/2);
   boids.push(boid2);
+
+  
 
 }
 
@@ -28,6 +30,11 @@ function draw() {
     boid.draw();
   }
 
+  stroke('black')
+  line(wallDistance, 0, wallDistance, height)
+  line(width - wallDistance, 0, width - wallDistance, height)
+  line(0, wallDistance, width, wallDistance)
+  line(0, height - wallDistance, width, height - wallDistance)
   
 
 }
