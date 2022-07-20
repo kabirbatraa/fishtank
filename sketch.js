@@ -8,7 +8,7 @@ function setup() {
 
   noStroke()
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 1; i++) {
     boids.push(new Boid(width/2, height/2, random(0, 2*PI)));
   }
 
@@ -24,10 +24,8 @@ function draw() {
   // boid2.socialDistance(boids);
 
   for (let boid of boids) {
-    boid.applyWallForce();
-    boid.socialDistance(boids);
-    boid.draw(boids);
-    boid.update()
+    boid.update(boids)
+    boid.draw();
   }
 
   
@@ -38,7 +36,7 @@ function draw() {
 
 
 function drawArrow(base, vec, myColor) {
-  // return;
+  return;
   // vec = p5.Vector.sub(vec, base);
 
   push();

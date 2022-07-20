@@ -3,11 +3,11 @@ const maxRotationVel = 0.07;
 const boidVel = 3;
 const turningFriction = 0.008;
 
-const wallForce = 0.01;
+const wallForce = 0.0085;
 const socialDistanceForce = 0.01;
 
 const socialDistanceSize = 100;
-const wallDistance = 100;
+const wallDistance = 150;
 
 class Boid {
   constructor(x = width/2, y = height/2, r = 0) {
@@ -97,83 +97,38 @@ class Boid {
     }
   }
 
-  socialDistance(allBoids) {
-    const maxDistanceSq = socialDistanceSize*socialDistanceSize;
+  socialDistance(boid) {
+    // if (boid == this) continue;
+    let deltaX = abs(this.pos.x - boid.pos.x);
+    let deltaY = abs(this.pos.y - boid.pos.y);
+    if (socialDistanceSize*socialDistanceSize >= deltaX*deltaX + deltaY*deltaY) {
 
-    let isNearBoid = false;
+      // let boidDirectionVector = boid.rotation;
+      let boidToThisVector = createVector(this.pos.x - boid.pos.x, this.pos.y - boid.pos.y)
+      
+      let goalVector = boidToThisVector;
+
+      drawArrow(boid.pos, boidToThisVector, 'green');
+      this.goToGoalVector(goalVector.heading(), socialDistanceForce);
+
+    }
+
+  }
+
+
+  assimilate(boid) {
+
+  }
+
+  update(allBoids) {
+
+    this.applyWallForce();
 
     for (let boid of allBoids) {
       if (boid == this) continue;
-      let deltaX = abs(this.pos.x - boid.pos.x);
-      let deltaY = abs(this.pos.y - boid.pos.y);
-      if (maxDistanceSq >= deltaX*deltaX + deltaY*deltaY) {
-        isNearBoid = true;
-
-        // let boidDirectionVector = boid.rotation;
-        let boidToThisVector = createVector(this.pos.x - boid.pos.x, this.pos.y - boid.pos.y)
-        
-        let goalVector = boidToThisVector;
-
-        drawArrow(boid.pos, boidToThisVector, 'green');
-        this.goToGoalVector(goalVector.heading(), socialDistanceForce);
-
-      }
+      this.socialDistance(boid);
+      this.assimilate(boid);
     }
-    // if (isNearBoid) {
-    //   this.color = 'red';
-    // }
-    // else {
-    //   this.color = 'white'
-    // }
-  }
-
-  OLDsocialDistance(allBoids) {
-    const maxDistanceSq = socialDistanceSize*socialDistanceSize;
-
-    let isNearBoid = false;
-
-    for (let boid of allBoids) {
-      if (boid == this) continue;
-      let deltaX = abs(this.pos.x - boid.pos.x);
-      let deltaY = abs(this.pos.y - boid.pos.y);
-      if (maxDistanceSq >= deltaX*deltaX + deltaY*deltaY) {
-        isNearBoid = true;
-
-        // let boidDirectionVector = boid.rotation;
-        let boidToThisVector = createVector(this.pos.x - boid.pos.x, this.pos.y - boid.pos.y)
-        let thetaBetween = (boid.rotation - boidToThisVector.heading()) % (2*PI);
-        let projectionOntoBoidDirectionVectorMag = boidToThisVector.mag() * cos(thetaBetween);
-        let projectionOntoBoidDirectionVector = createVector(
-          projectionOntoBoidDirectionVectorMag * cos(boid.rotation), 
-          projectionOntoBoidDirectionVectorMag * sin(boid.rotation)
-        )
-        let goalVector = p5.Vector.sub(boidToThisVector, projectionOntoBoidDirectionVector);
-        let goalVectorDir = goalVector.heading();
-        // drawArrow()
-        drawArrow(boid.pos, boidToThisVector, 'yellow');
-        drawArrow(boid.pos, projectionOntoBoidDirectionVector, 'blue');
-        drawArrow(boid.pos, goalVector, 'green');
-        
-        if (((this.rotation - goalVectorDir) + 2*PI) % (2*PI) > PI) { 
-          this.applyRotationForce(0.01); // turn right
-          console.log('right')
-        } 
-        else {
-          this.applyRotationForce(-0.01);
-          console.log('left')
-        }
-      }
-    }
-    if (isNearBoid) {
-      this.color = 'red';
-      // this.applyRotationForce(random([-1, 1]) * 0.01);
-    }
-    else {
-      this.color = 'white'
-    }
-  }
-
-  update() {
 
     // this.rotationVel = (mouseX / width - 0.5)/5;
 
@@ -206,6 +161,63 @@ class Boid {
     // if rotation greater than 2pi, then wrap around
     this.rotation = this.rotation % (2*PI);
   }
+
+
+
+
+
+
+
+
+
+
+
+  
+  // OLDsocialDistance(allBoids) {
+  //   const maxDistanceSq = socialDistanceSize*socialDistanceSize;
+
+  //   let isNearBoid = false;
+
+  //   for (let boid of allBoids) {
+  //     if (boid == this) continue;
+  //     let deltaX = abs(this.pos.x - boid.pos.x);
+  //     let deltaY = abs(this.pos.y - boid.pos.y);
+  //     if (maxDistanceSq >= deltaX*deltaX + deltaY*deltaY) {
+  //       isNearBoid = true;
+
+  //       // let boidDirectionVector = boid.rotation;
+  //       let boidToThisVector = createVector(this.pos.x - boid.pos.x, this.pos.y - boid.pos.y)
+  //       let thetaBetween = (boid.rotation - boidToThisVector.heading()) % (2*PI);
+  //       let projectionOntoBoidDirectionVectorMag = boidToThisVector.mag() * cos(thetaBetween);
+  //       let projectionOntoBoidDirectionVector = createVector(
+  //         projectionOntoBoidDirectionVectorMag * cos(boid.rotation), 
+  //         projectionOntoBoidDirectionVectorMag * sin(boid.rotation)
+  //       )
+  //       let goalVector = p5.Vector.sub(boidToThisVector, projectionOntoBoidDirectionVector);
+  //       let goalVectorDir = goalVector.heading();
+  //       // drawArrow()
+  //       drawArrow(boid.pos, boidToThisVector, 'yellow');
+  //       drawArrow(boid.pos, projectionOntoBoidDirectionVector, 'blue');
+  //       drawArrow(boid.pos, goalVector, 'green');
+        
+  //       if (((this.rotation - goalVectorDir) + 2*PI) % (2*PI) > PI) { 
+  //         this.applyRotationForce(0.01); // turn right
+  //         console.log('right')
+  //       } 
+  //       else {
+  //         this.applyRotationForce(-0.01);
+  //         console.log('left')
+  //       }
+  //     }
+  //   }
+  //   if (isNearBoid) {
+  //     this.color = 'red';
+  //     // this.applyRotationForce(random([-1, 1]) * 0.01);
+  //   }
+  //   else {
+  //     this.color = 'white'
+  //   }
+  // }
 
 
 }
