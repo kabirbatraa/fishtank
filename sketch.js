@@ -54,7 +54,7 @@ function drawArrow(base, vec, myColor) {
   push();
   stroke(myColor);
   strokeWeight(3);
-  fill(myColor);
+  fill(myColor); 
   translate(base.x, base.y);
   line(0, 0, vec.x, vec.y);
   rotate(vec.heading());

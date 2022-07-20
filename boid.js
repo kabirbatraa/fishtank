@@ -137,6 +137,7 @@ class Boid {
       // let goalVector = boid.rotation as a vector;
 
       // drawArrow(boid.pos, boidToThisVector, 'green');
+      drawArrow(this.pos, createVector(50 * cos(boid.rotation), 50*sin(boid.rotation)), '#0000ff11')
       this.goToGoalVector(boid.rotation, assimilateForce);
 
     }
