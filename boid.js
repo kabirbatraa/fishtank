@@ -1,21 +1,26 @@
 
 const maxRotationVel = 0.06;
-const boidVel = 3;
+const regularVel = 3;
+const turningVel = 2.4;
+
 const turningFriction = 0.008;
 
 const wallForce = 0.0085;
 const socialDistanceForce = 0.01;
-const assimilateForce = 0.005;
+const assimilateForce = 0.001;
 
-const socialDistanceSize = 50;
-const wallDistance = 100;
-const assimilateSize = 100
+const socialDistanceSize = 40;
+const wallDistance = 300;
+const assimilateSize = 120
+
+const boidSize = 10;
+
 
 class Boid {
   constructor(x = width/2, y = height/2, r = 0) {
     this.pos = createVector(x, y);
 
-    this.vel = boidVel;
+    this.vel = regularVel;
     // this.vel = 0;
 
     this.rotation = r
@@ -33,16 +38,18 @@ class Boid {
     stroke(0);
     fill(this.color);
     beginShape();
-    vertex(15, 0);
-    vertex(-15, -15);
-    vertex(-10, 0);
-    vertex(-15, 15);
+    vertex(boidSize, 0);
+    vertex(-boidSize, -boidSize);
+    vertex(-boidSize * 2/3, 0);
+    vertex(-boidSize, boidSize);
     endShape(CLOSE);
-    noFill();
-    stroke('red')
-    circle(0,0,socialDistanceSize*2);
-    stroke('blue')
-    circle(0,0,assimilateSize*2);
+    if (debugLines) {
+      noFill();
+      stroke('red')
+      circle(0,0,socialDistanceSize*2);
+      stroke('blue')
+      circle(0,0,assimilateSize*2);
+    }
     pop()
   }
 
@@ -151,11 +158,21 @@ class Boid {
     if (this.rotationVel > maxRotationVel) this.rotationVel = maxRotationVel
     if (this.rotationVel < -maxRotationVel) this.rotationVel = -maxRotationVel
     this.rotation += this.rotationVel;
+    let isTurning = false;
+    if (this.rotationVel != 0) {
+      isTurning = true;
+    }
     if (abs(this.rotationVel) <= turningFriction) this.rotationVel = 0;
     if (this.rotationVel > turningFriction) this.rotationVel -= turningFriction;
     if (this.rotationVel < -turningFriction) this.rotationVel += turningFriction;
 
     // move position by velocity
+    if (isTurning) {
+      this.vel = turningVel;
+    }
+    else {
+      this.vel = regularVel;
+    }
     this.pos.x += this.vel * cos(this.rotation)
     this.pos.y += this.vel * sin(this.rotation)
     

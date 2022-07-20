@@ -3,12 +3,14 @@ let boids = [];
 
 let boid2;
 
+const debugLines = false;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
   noStroke()
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 30; i++) {
     boids.push(new Boid(width/2, height/2, random(0, 2*PI)));
   }
 
@@ -30,11 +32,14 @@ function draw() {
     boid.draw();
   }
 
-  stroke('black')
-  line(wallDistance, 0, wallDistance, height)
-  line(width - wallDistance, 0, width - wallDistance, height)
-  line(0, wallDistance, width, wallDistance)
-  line(0, height - wallDistance, width, height - wallDistance)
+  if (debugLines) {
+    stroke('black')
+    line(wallDistance, 0, wallDistance, height)
+    line(width - wallDistance, 0, width - wallDistance, height)
+    line(0, wallDistance, width, wallDistance)
+    line(0, height - wallDistance, width, height - wallDistance)
+  }
+  
   
 
 }
