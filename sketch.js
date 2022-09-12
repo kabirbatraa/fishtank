@@ -1,9 +1,12 @@
 
 let boids = [];
 
-let boid2;
+// let boid2;
 
-const debugLines = false;
+let drawArrows = false;
+let drawArrowsButton;
+let debugLines = false;
+let drawDebugLinesButton;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -14,15 +17,17 @@ function setup() {
     boids.push(new Boid(width/2, height/2, random(0, 2*PI)));
   }
 
-  boid2 = new Boid(width/2, height/2);
-  boids.push(boid2);
+  // boid2 = new Boid(width/2, height/2);
+  // boids.push(boid2);
 
-  
+  drawArrowsButton = new Button('toggle arrows', 5, 5, 100, 20, 5, 'white', 'black');
+  drawDebugLinesButton = new Button('toggle debug lines', 110, 5, 125, 20, 5, 'white', 'black');
 
 }
 
 function draw() {
   background(220);
+  // background('#005EB8');
 
   // boid2.pos.x = moruseX; boid2.pos.y = mouseY;
   // boid2.socialDistance(boids);
@@ -41,14 +46,22 @@ function draw() {
   }
   
   
+  if (drawArrowsButton.checkHover()) drawArrowsButton.color = '#cccccc';
+  else drawArrowsButton.color = 'white';
+  drawArrowsButton.draw();
 
+  if (drawDebugLinesButton.checkHover()) drawDebugLinesButton.color = '#cccccc';
+  else drawDebugLinesButton.color = 'white';
+  drawDebugLinesButton.draw();
+  
 }
 
 
 
 
 function drawArrow(base, vec, myColor) {
-  return;
+  if (!drawArrows)
+    return;
   // vec = p5.Vector.sub(vec, base);
 
   push();
@@ -62,4 +75,9 @@ function drawArrow(base, vec, myColor) {
   translate(vec.mag() - arrowSize, 0);
   triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
   pop();
+}
+
+function mouseClicked() {
+  if (drawArrowsButton.checkHover()) drawArrows = !drawArrows;
+  if (drawDebugLinesButton.checkHover()) debugLines = !debugLines;
 }
